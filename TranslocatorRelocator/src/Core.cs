@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Vintagestory.API.Common;
 using Vintagestory.API.Server;
 using TranslocatorRelocator.src.config;
@@ -15,6 +15,7 @@ namespace TranslocatorRelocator.src
         private static ICoreAPI api;
         private static Config config;
         public static RelocatedTranslocatorLinkManager linkManager;
+        public static TranslocatorHomeManager homeManager;
 
         public const string ServerPatchCategory = "server";
         public const string ClientPatchCategory = "client";
@@ -51,6 +52,10 @@ namespace TranslocatorRelocator.src
 
             sapi.Event.SaveGameLoaded += linkManager.Loading;
             sapi.Event.GameWorldSave += linkManager.Saving;
+
+            homeManager = new TranslocatorHomeManager(sapi);
+            sapi.Event.SaveGameLoaded += homeManager.Loading;
+            sapi.Event.GameWorldSave += homeManager.Saving;
 
             harmony?.PatchCategory(ServerPatchCategory);
         }

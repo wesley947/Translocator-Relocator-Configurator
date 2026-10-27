@@ -1,76 +1,81 @@
-# Translocator Relocator Fork
+# Translocator Relocator +Configurator
 
-Translocator Relocator was originally created by **Windows98** — see the [original mod page](https://mods.vintagestory.at/show/mod/22557). Updated here for **Vintage Story 1.22**.
+An enhanced version of **Translocator Relocator** for Vintage Story 1.22+, building upon the original mod by **Windows98** and the compatibility fork by **Tirello**.
 
-Mod ID: `translocatorrelocatorfork`
+**Mod ID:** `translocatorconfigurator`  
+**Version:** 1.0.9  
+**License:** MIT
 
-## What it does
+## Features
 
-Mine a fully-repaired static translocator and you'll get a Relocated Translocator block back. Place it anywhere, sneak-right-click to assign a link key, then place a second one with the same key — and you've built a custom-routed teleporter pair.
+Relocate repaired static translocators, connect them into named networks, and enjoy more control over your destinations.
 
-You can read the original mod's design notes on [its mod page](https://mods.vintagestory.at/show/mod/22557).
+**+Configurator enhancements:**
 
-## Installation
+- **Home Destinations:** Designate one Home translocator per network.
+- **Travel Modes:** Right-click to toggle between Random and Go Home.
+- **Visual Indicators:** Green particles for Random, red for Go Home, and purple for designated Home.
+- **Network Dropdown:** Select existing networks or enter names manually.
+- **Network-Wide Renaming:** Rename an entire network, including translocators in unloaded chunks.
+- **Safety Confirmations:** Prevent accidental Home replacement and conflicting network names.
+- **Persistent Settings:** Home designations and travel modes survive saving and reloading.
 
-Drop the latest release zip into your Vintage Story `Mods` folder:
+## Controls
 
-| Platform | Mods folder |
+| Action | Control |
 |---|---|
-| Windows | `%APPDATA%\VintagestoryData\Mods\` |
-| Linux | `~/.config/VintagestoryData/Mods/` |
-| macOS | `~/Library/Application Support/VintagestoryData/Mods/` |
+| Toggle Random / Go Home | Right-click |
+| Open Translocator Configurator | Shift + Right-click |
+| Rename entire network | Shift + Right-click the designated Home translocator |
 
-Or install via the Vintage Story mod manager once it's listed there.
+**Important:** Network-wide renaming is available only from the designated Home translocator.
 
-Required Vintage Story version: **1.22.0 or later**.
+## Installation and Upgrading
 
-## Migrating from Windows98's 1.0.3
+**Back up your world before installing or updating any mod.**
 
-This fork uses a different mod ID (`translocatorrelocatorfork` instead of `translocatorrelocator`) so it can be hosted alongside the original on the mod database. To migrate:
+1. Remove or disable your previous Translocator Relocator installation.
+2. Install Translocator Relocator +Configurator.
+3. Load your world and verify your existing translocators.
 
-1. Remove `translocatorrelocator` (the original) from your `Mods` folder.
-2. Drop this fork's zip in.
-3. Load your world.
+The enhanced mod retains the `translocatorrelocatorfork` block asset identifiers to preserve compatibility with existing worlds.
 
-On first load, an automatic remap runs that renames every `translocatorrelocator:relocatedtranslocator-*` block placed in your world to `translocatorrelocatorfork:relocatedtranslocator-*`. Your existing translocator placements, link keys, and pairings are preserved. The remap is tracked per-save so it only ever runs once.
+Upgrading has been successfully tested with Tirello's fork and older saved worlds. Existing translocators, network information, and updated settings survived save-and-reload testing.
 
-## Changes from the original 1.0.3
+**Do not enable multiple versions of Translocator Relocator simultaneously.**
 
-- Compatibility with Vintage Story 1.22.2 (.NET 10 retarget; `EvolvingNatFloat` particle field became a non-nullable struct in the 1.22 API)
-- `modinfo.json` dependency string parses cleanly with no startup warning
-- Arrivals land one block in front of the destination instead of dead-center on its collision pad — prevents the auto-respool bug that would teleport players back a few seconds after arriving
-- `Harmony.UnpatchAll` is scoped to this mod's ID so disposing the mod doesn't accidentally strip patches from unrelated mods
-- `modicon.png` is now correctly packaged into the build output (the source's csproj was missing a content reference)
-- One-time block remap migration for users coming from the original 1.0.3 (see above)
+## Known Issues
 
-## Building from source
+Removing or destroying translocators while the mod is disabled may leave outdated entries in the network registry.
 
-Requires:
+The inherited `/tr wipeAllData` command clears all stored network records, not just invalid entries. Use extreme caution.
+
+A safer network-repair feature is being considered for a future release.
+
+## Building from Source
+
+Requirements:
 
 - .NET 10 SDK
-- A Vintage Story 1.22+ install
+- Vintage Story 1.22+ installation
 
-```sh
-git clone https://github.com/Tirello-Nardell/TranslocatorRelocator.git
-cd TranslocatorRelocator
-VINTAGE_STORY="/path/to/Vintagestory" dotnet build TranslocatorRelocator/TranslocatorRelocator.csproj -c Release
+```powershell
+$env:VINTAGE_STORY = "$env:APPDATA\Vintagestory"
+dotnet build TranslocatorRelocator/TranslocatorRelocator.csproj -c Release
 ```
 
-Build output lands at `TranslocatorRelocator/bin/Release/Mods/mod/`. Zip the contents of that directory and drop the zip into your VS `Mods` folder.
+## Reporting Issues
 
-## Reporting issues
-
-For bugs in this **fork specifically** (1.22-related issues, the migration, or anything introduced by the changes listed above), open an issue on [this repo](https://github.com/Tirello-Nardell/TranslocatorRelocator/issues).
-
-For bugs that exist in the original mod's design or behavior, please report them upstream at [Wondiws98/TranslocatorRelocator](https://github.com/Wondiws98/TranslocatorRelocator) or via the [mod page comments](https://mods.vintagestory.at/show/mod/22557).
+Please use the [GitHub Issue Tracker](https://github.com/wesley947/Translocator-Relocator-Configurator/issues) for bug reports, suggestions, and feature requests.
 
 ## Credits
 
-| Role | Author | Links |
-|---|---|---|
-| Original mod | **Windows98** | [mod page](https://mods.vintagestory.at/show/mod/22557) · [GitHub](https://github.com/Wondiws98/TranslocatorRelocator) |
-| 1.22 fork | **Tirello** | [GitHub](https://github.com/Tirello-Nardell/TranslocatorRelocator) |
+- **Windows98:** Original creator of Translocator Relocator. [Original Mod](https://mods.vintagestory.at/show/mod/22557)
+- **Tirello:** Vintage Story 1.22 compatibility fork, migration support, and teleportation fixes. [Tirello's Fork](https://mods.vintagestory.at/show/mod/49324)
+- **Lingam:** +Configurator enhancements, including Home destinations, travel modes, network management, interface improvements, and visual indicators.
+
+Special thanks to Windows98 and Tirello for making these enhancements possible.
 
 ## License
 
-MIT — see [`LICENSE`](LICENSE).
+MIT — see [LICENSE](LICENSE). Original copyright notices are retained.

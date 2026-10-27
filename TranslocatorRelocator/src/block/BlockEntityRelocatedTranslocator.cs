@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Text;
+using System.Linq;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.Common.Entities;
@@ -28,6 +29,11 @@ namespace TranslocatorRelocator.src.block
 
         private bool isLinked;
 
+        private bool travelHome;
+        private bool homeDesignationVisual;
+        private GuiDialogHomeReplaceConfirm homeConfirmDialog;
+        private GuiDialogNetworkRenameConfirm networkRenameConfirmDialog;
+
         private BlockPos[] links;
 
         private GuiDialogLinkKeyInput guiDialogLinkKeyInput;
@@ -48,9 +54,20 @@ namespace TranslocatorRelocator.src.block
 
         public override Vec3d GetTarget(Entity forEntity)
         {
-            Random random = new Random();
-            int index = random.Next(links.Length);
-            BlockPos destPos = links[index];
+            BlockPos destPos = null;
+            if (travelHome && Api.Side == EnumAppSide.Server)
+            {
+                var home = Core.homeManager?.GetHome(linkKey);
+                if (home != null && !home.Equals(Pos) && Array.Exists(links, p => p.Equals(home)))
+                {
+                    destPos = home;
+                }
+            }
+            if (destPos == null)
+            {
+                Random random = new Random();
+                destPos = links[random.Next(links.Length)];
+            }
 
             Block destBlock = Api.World.BlockAccessor.GetBlock(destPos);
             BlockFacing facing = BlockFacing.FromCode(destBlock?.Variant?["side"])?.Opposite ?? BlockFacing.NORTH;
@@ -217,10 +234,13 @@ namespace TranslocatorRelocator.src.block
                 animUtil.StopAnimation("idle");
             }
 
-            int num3 = 53;
-            int num4 = 221;
-            int num5 = 172;
-            simpleParticleProperties.Color = (num3 << 16) | (num4 << 8) | num5 | 0x32000000;
+            // Normal retains original green/opacity. Home and Go Home are more saturated
+            // and less translucent so that red and purple remain distinct in-game.
+            int num3 = homeDesignationVisual ? 170 : (travelHome ? 255 : 53);
+            int num4 = homeDesignationVisual ? 112 : (travelHome ? 100 : 221);
+            int num5 = homeDesignationVisual ? 255 : (travelHome ? 100 : 172);
+            int particleAlpha = (homeDesignationVisual || travelHome) ? 0x70000000 : 0x32000000;
+            simpleParticleProperties.Color = (num3 << 16) | (num4 << 8) | num5 | particleAlpha;
             simpleParticleProperties.AddPos.Set(0.0, 0.0, 0.0);
             simpleParticleProperties.BlueEvolve = EvolvingNatFloat.NoValueSet;
             simpleParticleProperties.RedEvolve = EvolvingNatFloat.NoValueSet;
@@ -276,6 +296,7 @@ namespace TranslocatorRelocator.src.block
 
         private void OnServerGameTick250ms(float dt)
         {
+            ReconcileNetworkName();
             if (linkKey.Length > 0 && isLinked)
             {
                 try
@@ -292,7 +313,32 @@ namespace TranslocatorRelocator.src.block
 
         private void OnServerGameTick1s(float dt)
         {
+            ReconcileNetworkName();
             CheckLinks();
+            if (Core.homeManager == null) return;
+            bool isNetworkHome = Core.homeManager.IsHome(Pos, linkKey);
+            bool change = homeDesignationVisual != isNetworkHome;
+            homeDesignationVisual = isNetworkHome;
+            if (travelHome && (isNetworkHome || Core.homeManager.GetHome(linkKey) == null))
+            {
+                travelHome = false;
+                change = true;
+            }
+            if (change) MarkDirty();
+        }
+
+        // rtData is authoritative for bulk renames; this handles even unloaded locations.
+        private void ReconcileNetworkName()
+        {
+            if (Api?.Side != EnumAppSide.Server || Core.linkManager?.rtData == null) return;
+            if (!Core.linkManager.rtData.TryGetValue(Pos, out string registeredKey)) return;
+            if (registeredKey == linkKey) return;
+            linkKey = registeredKey ?? "";
+            homeDesignationVisual = Core.homeManager?.IsHome(Pos, linkKey) == true;
+            if (travelHome && (homeDesignationVisual || Core.homeManager?.GetHome(linkKey) == null))
+                travelHome = false;
+            MarkDirty();
+            Api.World.BlockAccessor.GetChunkAtBlockPos(Pos)?.MarkModified();
         }
 
         public long MapRegionIndex2D(int regionX, int regionZ)
@@ -313,10 +359,11 @@ namespace TranslocatorRelocator.src.block
             ownBlock.teleportParticles.AddVelocity.Set(2f, 2f, 2f);
             ownBlock.teleportParticles.MinQuantity = 150f;
             ownBlock.teleportParticles.AddQuantity = 0.5f;
-            int num = 53;
-            int num2 = 221;
-            int num3 = 172;
-            ownBlock.teleportParticles.Color = (num << 16) | (num2 << 8) | num3 | 0x64000000;
+            int num = homeDesignationVisual ? 170 : (travelHome ? 255 : 53);
+            int num2 = homeDesignationVisual ? 112 : (travelHome ? 100 : 221);
+            int num3 = homeDesignationVisual ? 255 : (travelHome ? 100 : 172);
+            int burstAlpha = (homeDesignationVisual || travelHome) ? 0x7F000000 : 0x64000000;
+            ownBlock.teleportParticles.Color = (num << 16) | (num2 << 8) | num3 | burstAlpha;
             ownBlock.teleportParticles.BlueEvolve = EvolvingNatFloat.NoValueSet;
             ownBlock.teleportParticles.RedEvolve = EvolvingNatFloat.NoValueSet;
             ownBlock.teleportParticles.GreenEvolve = EvolvingNatFloat.NoValueSet;
@@ -337,7 +384,8 @@ namespace TranslocatorRelocator.src.block
                     dsc.AppendLine(Lang.Get("translocatorrelocatorfork:block-info-linked-status"));
                 }
             }
-
+            dsc.AppendLine("Travel mode: " + (travelHome ? "HOME" : "RANDOM"));
+            if (homeDesignationVisual) dsc.AppendLine("Network Home");
         }
 
         public override void OnBlockPlaced(ItemStack byItemStack = null)
@@ -355,6 +403,7 @@ namespace TranslocatorRelocator.src.block
             if (Api.Side == EnumAppSide.Server)
             {
                 Core.linkManager.RemoveKey(Pos);
+                Core.homeManager?.RemoveAt(Pos);
             }
 
             translocatingSound?.Dispose();
@@ -377,52 +426,197 @@ namespace TranslocatorRelocator.src.block
             }
         }
 
-        public override void OnReceivedClientPacket(IPlayer player, int packetid, byte[] data)
+        private void HandleRenameRequest(IServerPlayer player, int packetid, byte[] data)
         {
-            if (packetid == 1002)
+            NetworkRenamePacket request = SerializerUtil.Deserialize<NetworkRenamePacket>(data);
+            string newKey = (request?.NewKey ?? "").Trim();
+            string oldKey = linkKey;
+            if (request == null || request.OldKey != oldKey || !Core.homeManager.IsHome(Pos, oldKey))
             {
-                EditLinkKeyPacket editLinkKeyPacket = SerializerUtil.Deserialize<EditLinkKeyPacket>(data);
-                if (!editLinkKeyPacket.LinkKey.Equals(linkKey))
+                Notify(player, "Only the designated Home can rename its current network. Reopen its configuration.");
+                return;
+            }
+            if (newKey.Length == 0 || newKey.Length > 16 || newKey == oldKey)
+            {
+                Notify(player, "Enter a different network name (1-16 characters).");
+                return;
+            }
+            if (Core.linkManager.NetworkExists(newKey))
+            {
+                Notify(player, "Cannot rename: a network named '" + newKey + "' already exists. Networks will not be merged.");
+                return;
+            }
+            int count = Core.linkManager.CountForNetwork(oldKey);
+            if (count < 1) { Notify(player, "Network has no registered translocators."); return; }
+
+            if (packetid == 1004)
+            {
+                sapi.Network.SendBlockEntityPacket(player, Pos, 1005, SerializerUtil.Serialize(new NetworkRenamePacket
                 {
-                    linkKey = editLinkKeyPacket.LinkKey;
-                    Core.linkManager.AddOrSetKey(Pos, linkKey);
-                    MarkDirty(redrawOnClient: true);
-                    Api.World.BlockAccessor.GetChunkAtBlockPos(Pos).MarkModified();
-                }
+                    OldKey = oldKey, NewKey = newKey, ExpectedCount = count
+                }));
+                return;
+            }
+            if (packetid != 1006) return;
+            if (request.ExpectedCount != count)
+            {
+                Notify(player, "The network changed since you opened the confirmation. Please start the rename again.");
+                return;
+            }
+            try
+            {
+                int renamed = Core.linkManager.RenameNetwork(oldKey, newKey);
+                // The same Home block remains Home, now under the renamed network.
+                Core.homeManager.SetHome(newKey, Pos);
+                ReconcileNetworkName();
+                CheckLinks();
+                homeDesignationVisual = true;
+                MarkDirty();
+                Notify(player, "Renamed '" + oldKey + "' to '" + newKey + "' (" + renamed + " translocators). Home preserved.");
+            }
+            catch (System.Exception ex)
+            {
+                Api.Logger.Error(ex);
+                Notify(player, "Network rename failed. Please check the game log before retrying.");
             }
         }
 
+        public override void OnReceivedClientPacket(IPlayer player, int packetid, byte[] data)
+        {
+            if (Api.Side != EnumAppSide.Server || player is not IServerPlayer serverPlayer) return;
+            if (packetid == 1004 || packetid == 1006)
+            {
+                HandleRenameRequest(serverPlayer, packetid, data);
+                return;
+            }
+            if (packetid != 1002) return;
+
+            EditLinkKeyPacket request = SerializerUtil.Deserialize<EditLinkKeyPacket>(data);
+            string newKey = (request?.LinkKey ?? "").Trim();
+            if (newKey.Length > 16)
+            {
+                Notify(serverPlayer, "Network name must be 16 characters or fewer.");
+                return;
+            }
+            if (request.IsHome && newKey.Length == 0)
+            {
+                Notify(serverPlayer, "Name the network before setting its Home.");
+                return;
+            }
+
+            BlockPos existingHome = Core.homeManager.GetHome(newKey);
+            if (request.IsHome && existingHome != null && !existingHome.Equals(Pos) &&
+                (!request.ReplaceHome || request.ExpectedHomePos != existingHome.ToString()))
+            {
+                var conflict = new EditLinkKeyPacket
+                {
+                    LinkKey = newKey,
+                    IsHome = true,
+                    ExpectedHomePos = existingHome.ToString()
+                };
+                sapi.Network.SendBlockEntityPacket(serverPlayer, Pos, 1003, SerializerUtil.Serialize(conflict));
+                return;
+            }
+
+            bool wasHome = Core.homeManager.IsHome(Pos, linkKey);
+            if (linkKey != newKey)
+            {
+                Core.homeManager.RemoveAt(Pos);
+                linkKey = newKey;
+                Core.linkManager.AddOrSetKey(Pos, linkKey);
+            }
+            if (request.IsHome)
+            {
+                Core.homeManager.SetHome(linkKey, Pos);
+                travelHome = false;
+            }
+            else if (wasHome)
+            {
+                Core.homeManager.RemoveAt(Pos);
+            }
+
+            homeDesignationVisual = Core.homeManager.IsHome(Pos, linkKey);
+            if (travelHome && Core.homeManager.GetHome(linkKey) == null) travelHome = false;
+            MarkDirty();
+            Notify(serverPlayer, "Network settings saved" + (homeDesignationVisual ? "; this portal is Home." : "."));
+        }
         public override void OnReceivedServerPacket(int packetid, byte[] data)
         {
             if (packetid == 1001)
             {
-                if (guiDialogLinkKeyInput != null && guiDialogLinkKeyInput.IsOpened())
-                {
-                    return;
-                }
-                guiDialogLinkKeyInput = new GuiDialogLinkKeyInput(Lang.Get("translocatorrelocatorfork:block-interaction-edit-link-key-text"), Pos, linkKey, Api as ICoreClientAPI);
+                if (guiDialogLinkKeyInput != null && guiDialogLinkKeyInput.IsOpened()) return;
+                EditLinkKeyPacket current = SerializerUtil.Deserialize<EditLinkKeyPacket>(data);
+                guiDialogLinkKeyInput = new GuiDialogLinkKeyInput(
+                    Lang.Get("translocatorrelocatorfork:dialog-title-configurator"),
+                    Pos, current.LinkKey ?? "", current.IsHome, current.NetworkNames, Api as ICoreClientAPI);
                 guiDialogLinkKeyInput.TryOpen();
+            }
+            else if (packetid == 1003)
+            {
+                EditLinkKeyPacket existing = SerializerUtil.Deserialize<EditLinkKeyPacket>(data);
+                if (homeConfirmDialog != null && homeConfirmDialog.IsOpened()) return;
+                homeConfirmDialog = new GuiDialogHomeReplaceConfirm(Pos, existing.LinkKey,
+                    existing.ExpectedHomePos, Api as ICoreClientAPI);
+                homeConfirmDialog.TryOpen();
+            }
+            else if (packetid == 1005)
+            {
+                NetworkRenamePacket details = SerializerUtil.Deserialize<NetworkRenamePacket>(data);
+                if (networkRenameConfirmDialog != null && networkRenameConfirmDialog.IsOpened()) return;
+                networkRenameConfirmDialog = new GuiDialogNetworkRenameConfirm(Pos, details, Api as ICoreClientAPI);
+                networkRenameConfirmDialog.TryOpen();
             }
         }
 
         public void OnRightClick(IPlayer byPlayer)
         {
-            if (byPlayer == null || !(byPlayer.Entity?.Controls?.ShiftKey).GetValueOrDefault())
+            if (Api is not ICoreServerAPI coreServerAPI || byPlayer is not IServerPlayer serverPlayer) return;
+            if (byPlayer.Entity?.Controls?.ShiftKey == true)
             {
+                var current = new EditLinkKeyPacket
+                {
+                    LinkKey = linkKey,
+                    IsHome = Core.homeManager.IsHome(Pos, linkKey),
+                    NetworkNames = Core.linkManager.links.Keys
+                        .Where(name => !string.IsNullOrWhiteSpace(name))
+                        .OrderBy(name => name, StringComparer.OrdinalIgnoreCase).ToArray()
+                };
+                coreServerAPI.Network.SendBlockEntityPacket(serverPlayer, Pos, 1001, SerializerUtil.Serialize(current));
                 return;
             }
 
-            if (Api is ICoreServerAPI coreServerAPI)
+            if (string.IsNullOrEmpty(linkKey))
             {
-                coreServerAPI.Network.SendBlockEntityPacket((IServerPlayer)byPlayer, Pos, 1001);
+                Notify(serverPlayer, "This translocator has no network key. Shift + Right-click to configure it.");
+                return;
             }
+            if (Core.homeManager.IsHome(Pos, linkKey))
+            {
+                if (travelHome) { travelHome = false; MarkDirty(); }
+                Notify(serverPlayer, "This is the network Home. Travel mode: RANDOM.");
+                return;
+            }
+            if (!travelHome && Core.homeManager.GetHome(linkKey) == null)
+            {
+                Notify(serverPlayer, "No Home is set for network '" + linkKey + "'. Travel mode: RANDOM.");
+                return;
+            }
+            travelHome = !travelHome;
+            MarkDirty();
+            Notify(serverPlayer, "Network '" + linkKey + "' - travel mode: " + (travelHome ? "HOME" : "RANDOM"));
         }
 
+        private static void Notify(IServerPlayer player, string message)
+        {
+            player.SendMessage(GlobalConstants.GeneralChatGroup, "[Translocator] " + message, EnumChatType.Notification);
+        }
         public override void FromTreeAttributes(ITreeAttribute tree, IWorldAccessor worldAccessForResolve)
         {
             base.FromTreeAttributes(tree, worldAccessForResolve);
             linkKey = tree.GetString("linkkey");
             isLinked = tree.GetBool("isLinked");
+            travelHome = tree.GetBool("trfTravelHome");
+            homeDesignationVisual = tree.GetBool("trfIsHomeVisual");
 
             if (worldAccessForResolve == null || worldAccessForResolve.Side != EnumAppSide.Client)
             {
@@ -444,6 +638,8 @@ namespace TranslocatorRelocator.src.block
             base.ToTreeAttributes(tree);
             tree.SetString("linkkey", linkKey);
             tree.SetBool("isLinked", isLinked);
+            tree.SetBool("trfTravelHome", travelHome);
+            tree.SetBool("trfIsHomeVisual", homeDesignationVisual);
         }
 
         public override bool OnTesselation(ITerrainMeshPool mesher, ITesselatorAPI tessThreadTesselator)

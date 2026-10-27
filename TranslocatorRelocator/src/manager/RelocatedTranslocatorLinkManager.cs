@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using System.Text;
 using System.Collections.Generic;
 using Vintagestory.API.Server;
@@ -87,6 +87,34 @@ namespace TranslocatorRelocator.src.manager
             rtData.Clear();
             UpdateLinks();
             return TextCommandResult.Success("Wiped all translocator data, hope this was intentional!");
+        }
+
+        // Bulk rename changes the authoritative registry. Unloaded block entities will
+        // reconcile their own saved linkKey on the next server tick after loading.
+        public int CountForNetwork(string linkKey)
+        {
+            if (rtData == null || string.IsNullOrEmpty(linkKey)) return 0;
+            return rtData.Values.Count(value => value == linkKey);
+        }
+
+        public bool NetworkExists(string linkKey)
+        {
+            return rtData != null && rtData.Values.Any(value =>
+                string.Equals(value, linkKey, System.StringComparison.OrdinalIgnoreCase));
+        }
+
+        public int RenameNetwork(string oldKey, string newKey)
+        {
+            if (string.IsNullOrWhiteSpace(oldKey) || string.IsNullOrWhiteSpace(newKey))
+                throw new System.ArgumentException("Both network names must be non-empty.");
+            if (newKey.Length > 16) throw new System.ArgumentException("Network names must be 16 characters or fewer.");
+            if (NetworkExists(newKey)) throw new System.InvalidOperationException("Destination network already exists.");
+            BlockPos[] positions = rtData.Where(pair => pair.Value == oldKey)
+                .Select(pair => pair.Key).ToArray();
+            if (positions.Length == 0) throw new System.InvalidOperationException("Source network no longer exists.");
+            foreach (BlockPos position in positions) rtData[position] = newKey;
+            UpdateLinks();
+            return positions.Length;
         }
 
         public void AddOrSetKey(BlockPos key, string linkKey = "")

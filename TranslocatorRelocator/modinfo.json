@@ -1,11 +1,15 @@
 {
-    "type": "code",
-    "modid": "translocatorrelocatorfork",
-    "name": "Translocator Relocator Fork",
-    "authors": ["Windows98", "Tirello"],
-    "description": "Move and link translocators at will. Original by Windows98; updated for VS 1.22.",
-    "version": "1.0.5",
-    "dependencies": {
-        "game": "1.22.0"
-    }
+    "type":  "code",
+    "modid":  "translocatorconfigurator",
+    "name":  "Translocator Relocator +Configurator",
+    "authors":  [
+                    "Windows98",
+                    "Tirello",
+                    "Lingam"
+                ],
+    "description":  "Move and link translocators with Home destinations, travel modes, and network management. Original by Windows98; fork by Tirello.",
+    "version":  "1.0.9",
+    "dependencies":  {
+                         "game":  "1.22.0"
+                     }
 }

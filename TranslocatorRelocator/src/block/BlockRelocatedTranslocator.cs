@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.Common.Entities;
@@ -53,8 +53,13 @@ namespace TranslocatorRelocator.src.block
 
         public override WorldInteraction[] GetPlacedBlockInteractionHelp(IWorldAccessor world, BlockSelection selection, IPlayer forPlayer)
         {
-            return new WorldInteraction[1]
+            return new WorldInteraction[2]
             {
+                new WorldInteraction
+                {
+                    ActionLangCode = "translocatorrelocatorfork:block-interaction-toggle-travel-mode-text",
+                    MouseButton = EnumMouseButton.Right
+                },
                 new WorldInteraction
                 {
                     ActionLangCode = "translocatorrelocatorfork:block-interaction-edit-link-key-text",

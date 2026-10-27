@@ -1,6 +1,8 @@
 {
     "block-relocatedtranslocator-*": "Translocator",
-    "block-interaction-edit-link-key-text": "Edit Key",
+    "block-interaction-edit-link-key-text": "Configure Translocator",
+    "dialog-title-configurator": "Translocator Configurator",
+    "block-interaction-toggle-travel-mode-text": "Toggle Travel Mode",
     "block-info-link-key-text": "Key: {0}",
     "block-info-linked-status": "Linked"
 }

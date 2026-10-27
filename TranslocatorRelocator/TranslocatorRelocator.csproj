@@ -1,12 +1,12 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <OutputPath>bin\$(Configuration)\Mods\mod</OutputPath>
     <!-- Release packaging. ModVersion must stay in sync with modinfo.json's "version" field. -->
-    <ModId>translocatorrelocatorfork</ModId>
-    <ModVersion>1.0.5</ModVersion>
+    <ModId>translocatorconfigurator</ModId>
+    <ModVersion>1.0.9</ModVersion>
     <ReleasesDir>$(ProjectDir)Releases</ReleasesDir>
     <ReleasePath>$(ReleasesDir)\$(ModId)_$(ModVersion).zip</ReleasePath>
   </PropertyGroup>
