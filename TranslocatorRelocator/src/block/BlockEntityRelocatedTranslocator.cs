@@ -237,8 +237,8 @@ namespace TranslocatorRelocator.src.block
             // Normal retains original green/opacity. Home and Go Home are more saturated
             // and less translucent so that red and purple remain distinct in-game.
             int num3 = homeDesignationVisual ? 170 : (travelHome ? 255 : 53);
-            int num4 = homeDesignationVisual ? 112 : (travelHome ? 100 : 221);
-            int num5 = homeDesignationVisual ? 255 : (travelHome ? 100 : 172);
+            int num4 = homeDesignationVisual ? 112 : (travelHome ? 40 : 221);
+            int num5 = homeDesignationVisual ? 255 : (travelHome ? 25 : 172);
             int particleAlpha = (homeDesignationVisual || travelHome) ? 0x70000000 : 0x32000000;
             simpleParticleProperties.Color = (num3 << 16) | (num4 << 8) | num5 | particleAlpha;
             // Keep the falling particles self-illuminated in darkness (does not light nearby blocks).
@@ -363,8 +363,8 @@ namespace TranslocatorRelocator.src.block
             ownBlock.teleportParticles.MinQuantity = 150f;
             ownBlock.teleportParticles.AddQuantity = 0.5f;
             int num = homeDesignationVisual ? 170 : (travelHome ? 255 : 53);
-            int num2 = homeDesignationVisual ? 112 : (travelHome ? 100 : 221);
-            int num3 = homeDesignationVisual ? 255 : (travelHome ? 100 : 172);
+            int num2 = homeDesignationVisual ? 112 : (travelHome ? 40 : 221);
+            int num3 = homeDesignationVisual ? 255 : (travelHome ? 25 : 172);
             int burstAlpha = (homeDesignationVisual || travelHome) ? 0x7F000000 : 0x64000000;
             ownBlock.teleportParticles.Color = (num << 16) | (num2 << 8) | num3 | burstAlpha;
             ownBlock.teleportParticles.BlueEvolve = EvolvingNatFloat.NoValueSet;
