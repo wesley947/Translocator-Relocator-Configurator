@@ -239,7 +239,7 @@ namespace TranslocatorRelocator.src.block
             int num3 = homeDesignationVisual ? 142 : (travelHome ? 255 : 28);
             int num4 = homeDesignationVisual ? 106 : (travelHome ? 60 : 180);
             int num5 = homeDesignationVisual ? 255 : (travelHome ? 36 : 126);
-            int particleAlpha = (homeDesignationVisual || travelHome) ? 0x70000000 : 0x32000000;
+            int particleAlpha = (homeDesignationVisual || travelHome) ? 0xA0000000 : 0x32000000;
             simpleParticleProperties.Color = (num3 << 16) | (num4 << 8) | num5 | particleAlpha;
             // Keep the falling particles self-illuminated in darkness (does not light nearby blocks).
             simpleParticleProperties.VertexFlags = 128;
