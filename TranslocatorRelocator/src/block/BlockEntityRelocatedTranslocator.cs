@@ -236,11 +236,14 @@ namespace TranslocatorRelocator.src.block
 
             // Normal retains original green/opacity. Home and Go Home are more saturated
             // and less translucent so that red and purple remain distinct in-game.
-            int num3 = homeDesignationVisual ? 170 : (travelHome ? 255 : 53);
-            int num4 = homeDesignationVisual ? 112 : (travelHome ? 100 : 221);
-            int num5 = homeDesignationVisual ? 255 : (travelHome ? 100 : 172);
-            int particleAlpha = (homeDesignationVisual || travelHome) ? 0x70000000 : 0x32000000;
+            int num3 = homeDesignationVisual ? 110 : (travelHome ? 255 : 22);
+            int num4 = homeDesignationVisual ? 55 : (travelHome ? 60 : 160);
+            int num5 = homeDesignationVisual ? 220 : (travelHome ? 36 : 100);
+            int particleAlpha = (homeDesignationVisual || travelHome) ? unchecked((int)0xA0000000) : 0x32000000;
             simpleParticleProperties.Color = (num3 << 16) | (num4 << 8) | num5 | particleAlpha;
+            // Keep the falling particles self-illuminated in darkness (does not light nearby blocks).
+            simpleParticleProperties.VertexFlags = 128;
+            simpleParticleProperties.LightEmission = ColorUtil.ColorFromRgba(num3, num4, num5, 255);
             simpleParticleProperties.AddPos.Set(0.0, 0.0, 0.0);
             simpleParticleProperties.BlueEvolve = EvolvingNatFloat.NoValueSet;
             simpleParticleProperties.RedEvolve = EvolvingNatFloat.NoValueSet;
@@ -359,9 +362,9 @@ namespace TranslocatorRelocator.src.block
             ownBlock.teleportParticles.AddVelocity.Set(2f, 2f, 2f);
             ownBlock.teleportParticles.MinQuantity = 150f;
             ownBlock.teleportParticles.AddQuantity = 0.5f;
-            int num = homeDesignationVisual ? 170 : (travelHome ? 255 : 53);
-            int num2 = homeDesignationVisual ? 112 : (travelHome ? 100 : 221);
-            int num3 = homeDesignationVisual ? 255 : (travelHome ? 100 : 172);
+            int num = homeDesignationVisual ? 110 : (travelHome ? 255 : 22);
+            int num2 = homeDesignationVisual ? 55 : (travelHome ? 60 : 160);
+            int num3 = homeDesignationVisual ? 220 : (travelHome ? 36 : 100);
             int burstAlpha = (homeDesignationVisual || travelHome) ? 0x7F000000 : 0x64000000;
             ownBlock.teleportParticles.Color = (num << 16) | (num2 << 8) | num3 | burstAlpha;
             ownBlock.teleportParticles.BlueEvolve = EvolvingNatFloat.NoValueSet;

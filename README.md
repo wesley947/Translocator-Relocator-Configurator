@@ -3,7 +3,7 @@
 An enhanced version of **Translocator Relocator** for Vintage Story 1.22+, building upon the original mod by **Windows98** and the compatibility fork by **Tirello**.
 
 **Mod ID:** `translocatorconfigurator`  
-**Version:** 1.0.9  
+**Version:** 1.0.10  
 **License:** MIT
 
 ## Features

@@ -8,7 +8,7 @@
                     "Lingam"
                 ],
     "description":  "Move and link translocators with Home destinations, travel modes, and network management. Original by Windows98; fork by Tirello.",
-    "version":  "1.0.9",
+    "version":  "1.0.10",
     "dependencies":  {
                          "game":  "1.22.0"
                      }
