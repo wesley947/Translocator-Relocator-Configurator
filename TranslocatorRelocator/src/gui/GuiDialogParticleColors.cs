@@ -9,13 +9,12 @@ namespace TranslocatorRelocator.src.gui
     // Client-side appearance editor; no network packets or world changes.
     public class GuiDialogParticleColors : GuiDialogGeneric
     {
-        // Rainbow ordering: light, vivid, deep shades, plus pure white.
+        // Nine distinct, saturated colors ordered from warm to cool, then pink and white.
+        // Existing custom values outside this palette are preserved until changed.
         private static readonly string[] PaletteHex =
         {
-            "#FF6868", "#FFA248", "#FFE563", "#78D66F", "#52C9FF", "#8585FF", "#D68AFF",
-            "#FF3C24", "#FF821F", "#FFD024", "#31B85C", "#168ADB", "#5965E9", "#AE4DEB",
-            "#D62C37", "#E56300", "#E6AE0E", "#16A064", "#0055FF", "#3B45B8", "#6E37DC",
-            "#FFFFFF"
+            "#FF3C24", "#FF8A00", "#FFE000", "#16C45B", "#00C8C8",
+            "#0055FF", "#6E37DC", "#FF36B8", "#FFFFFF"
         };
 
         private static readonly int[] PaletteColors = BuildPickerColors();
@@ -28,7 +27,7 @@ namespace TranslocatorRelocator.src.gui
             settings = Core.ParticleVisuals ?? new ParticleVisualConfig();
             settings.Sanitize();
 
-            ElementBounds shade = ElementBounds.FixedSize(390, 412)
+            ElementBounds shade = ElementBounds.FixedSize(390, 342)
                 .WithFixedPadding(GuiStyle.ElementToDialogPadding);
             ElementBounds root = ElementStdBounds.AutosizedMainDialog
                 .WithAlignment(EnumDialogArea.RightMiddle)
@@ -54,22 +53,22 @@ namespace TranslocatorRelocator.src.gui
                 .AddStaticText("Choose color", CairoFont.WhiteSmallText(),
                     ElementBounds.Fixed(0, 126, 195, 24))
                 .AddColorListPicker(PaletteColors, OnColorPicked,
-                    ElementBounds.Fixed(28, 150, 34, 28), 311, "colorPalette")
+                    ElementBounds.Fixed(0, 150, 34, 28), 345, "colorPalette")
                 .AddDynamicText("", CairoFont.WhiteSmallText(),
-                    ElementBounds.Fixed(0, 252, 366, 24), "currentColor")
+                    ElementBounds.Fixed(0, 191, 366, 24), "currentColor")
 
                 .AddStaticText("Particle flow", CairoFont.WhiteSmallText(),
-                    ElementBounds.Fixed(0, 286, 170, 24))
+                    ElementBounds.Fixed(0, 225, 170, 24))
                 .AddDynamicText("", CairoFont.WhiteSmallText(),
-                    ElementBounds.Fixed(312, 286, 54, 24), "flowValue")
+                    ElementBounds.Fixed(312, 225, 54, 24), "flowValue")
                 .AddSlider(OnFlowChanged,
-                    ElementBounds.Fixed(0, 313, 366, 28), "flow")
-                .AddStaticText("Use default effects", CairoFont.WhiteSmallText(),
-                    ElementBounds.Fixed(0, 375, 190, 26))
+                    ElementBounds.Fixed(0, 252, 366, 28), "flow")
+                .AddStaticText("Use Defaults", CairoFont.WhiteSmallText(),
+                    ElementBounds.Fixed(0, 302, 190, 26))
                 .AddSwitch(OnDefaultsChanged,
-                    ElementBounds.Fixed(201, 366, 36, 36), "useDefaults")
+                    ElementBounds.Fixed(201, 293, 36, 36), "useDefaults")
                 .AddSmallButton("Done", OnDone,
-                    ElementBounds.Fixed(281, 373, 84, 28))
+                    ElementBounds.Fixed(281, 300, 84, 28))
                 .EndChildElements()
                 .Compose();
 
