@@ -49,7 +49,7 @@ namespace TranslocatorRelocator.src.gui
                 .EndClip()
                 .AddDropDown(choices, displayNames, 0, OnNetworkChosen, ElementBounds.Fixed(199, 30, 128, 28), "existingNetworks")
                 .AddStaticText("Set as Home", CairoFont.WhiteSmallText(), ElementBounds.Fixed(95, 118, 128, 25))
-                .AddSwitch(value => makeHome = value, ElementBounds.Fixed(235, 109, 36, 36), "makeHome");
+                .AddSwitch(value => makeHome = value, ElementBounds.Fixed(211, 112, 36, 36), "makeHome");
             if (isHome)
                 composer.AddSmallButton("Rename Network", OnRenameNetwork,
                     ElementBounds.Fixed(0, 69, 162, 27));
