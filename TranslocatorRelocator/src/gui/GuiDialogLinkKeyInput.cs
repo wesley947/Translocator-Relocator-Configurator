@@ -34,9 +34,9 @@ namespace TranslocatorRelocator.src.gui
             displayNames[0] = "Networks...";
             ElementBounds textInputBounds = ElementBounds.Fixed(0.0, 0.0, (MAX_KEY_LENGHT*10)+26, 28);
             ElementBounds clipBounds1 = textInputBounds.ForkBoundingParent().WithFixedPosition(0.0, 30.0);
-            ElementBounds cancelButtonBounds = ElementBounds.FixedSize(0.0, 0.0).FixedUnder(clipBounds1, isHome ? 140.0 : 98.0).WithAlignment(EnumDialogArea.LeftFixed).WithFixedPadding(8.0, 2.0).WithFixedAlignmentOffset(-1.0, 0.0);
-            ElementBounds saveButtonBounds = ElementBounds.FixedSize(0.0, 0.0).FixedUnder(clipBounds1, isHome ? 140.0 : 98.0).WithAlignment(EnumDialogArea.RightFixed).WithFixedPadding(10.0, 2.0).WithFixedAlignmentOffset(6, 0);
-            ElementBounds shadeElementBounds = ElementBounds.FixedSize(350, isHome ? 219 : 177).WithFixedPadding(GuiStyle.ElementToDialogPadding);
+            ElementBounds cancelButtonBounds = ElementBounds.FixedSize(0.0, 0.0).FixedUnder(clipBounds1, 98.0).WithAlignment(EnumDialogArea.LeftFixed).WithFixedPadding(8.0, 2.0).WithFixedAlignmentOffset(-1.0, 0.0);
+            ElementBounds saveButtonBounds = ElementBounds.FixedSize(0.0, 0.0).FixedUnder(clipBounds1, 98.0).WithAlignment(EnumDialogArea.RightFixed).WithFixedPadding(10.0, 2.0).WithFixedAlignmentOffset(6, 0);
+            ElementBounds shadeElementBounds = ElementBounds.FixedSize(350, 177).WithFixedPadding(GuiStyle.ElementToDialogPadding);
             ElementBounds mainBounds = ElementStdBounds.AutosizedMainDialog.WithAlignment(EnumDialogArea.RightMiddle).WithFixedAlignmentOffset(0.0 - GuiStyle.DialogToScreenPadding, 0.0);
             CairoFont cairoFont = CairoFont.TextInput().WithFontSize(20).WithFont("Consolas");
             cairoFont.LineHeightMultiplier = 0.9;
@@ -52,9 +52,9 @@ namespace TranslocatorRelocator.src.gui
                 .AddSwitch(value => makeHome = value, ElementBounds.Fixed(140, 64, 36, 36), "makeHome");
             if (isHome)
                 composer.AddSmallButton("Rename Network", OnRenameNetwork,
-                    ElementBounds.Fixed(0, 112, 169, 27));
+                    ElementBounds.Fixed(0, 112, 162, 27));
             composer.AddSmallButton("Particle Colors...", OnParticleColors,
-                ElementBounds.Fixed(0, isHome ? 151 : 109, 169, 27));
+                ElementBounds.Fixed(isHome ? 170 : 0, isHome ? 112 : 109, 163, 27));
             base.SingleComposer = composer
                 .AddSmallButton(Lang.Get("Cancel"), OnButtonCancel, cancelButtonBounds)
                 .AddSmallButton(Lang.Get("Save"), OnButtonSave, saveButtonBounds)
