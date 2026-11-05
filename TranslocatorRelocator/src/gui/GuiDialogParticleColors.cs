@@ -13,8 +13,9 @@ namespace TranslocatorRelocator.src.gui
         // Existing custom values outside this palette are preserved until changed.
         private static readonly string[] PaletteHex =
         {
-            "#FF3C24", "#FF8A00", "#FFE000", "#16C45B", "#00C8C8",
-            "#0055FF", "#6E37DC", "#FF36B8", "#FFFFFF"
+            ParticleVisualConfig.DefaultGoHome, "#FF8A00", "#FFE000",
+            ParticleVisualConfig.DefaultNormal, "#00C8C8", "#0055FF",
+            ParticleVisualConfig.DefaultHome, "#FF36B8", "#FFFFFF"
         };
 
         private static readonly int[] PaletteColors = BuildPickerColors();
