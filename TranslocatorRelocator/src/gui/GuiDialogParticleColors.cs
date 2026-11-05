@@ -66,7 +66,7 @@ namespace TranslocatorRelocator.src.gui
                 .AddStaticText("Use Defaults", CairoFont.WhiteSmallText(),
                     ElementBounds.Fixed(0, 302, 190, 26))
                 .AddSwitch(OnDefaultsChanged,
-                    ElementBounds.Fixed(201, 293, 36, 36), "useDefaults")
+                    ElementBounds.Fixed(124, 297, 36, 36), "useDefaults")
                 .AddSmallButton("Done", OnDone,
                     ElementBounds.Fixed(281, 300, 84, 28))
                 .EndChildElements()
