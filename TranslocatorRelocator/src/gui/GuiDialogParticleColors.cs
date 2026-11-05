@@ -115,7 +115,9 @@ namespace TranslocatorRelocator.src.gui
             if (SingleComposer == null) return;
             bool editing = !settings.UseDefaults;
 
-            SingleComposer.GetSlider("flow").Enabled = editing;
+            var flowSlider = SingleComposer.GetSlider("flow");
+            if (flowSlider.Enabled != editing) flowSlider.Enabled = editing;
+            flowSlider.SetValue(settings.EffectiveFlow);
             for (int i = 0; i < PaletteHex.Length; i++)
             {
                 var swatch = SingleComposer.GetColorListPicker("colorPalette-" + i);
@@ -130,7 +132,7 @@ namespace TranslocatorRelocator.src.gui
             SingleComposer.GetDynamicText("flowValue").SetNewText(
                 settings.EffectiveFlow + "%", forceRedraw: true);
 
-            string match = settings.GetCustomColor(selectedMode);
+            string match = settings.GetColor(selectedMode);
             int selectedIndex = Array.FindIndex(PaletteHex,
                 hex => string.Equals(hex, match, StringComparison.OrdinalIgnoreCase));
             SingleComposer.ColorListPickerSetValue("colorPalette", selectedIndex);
