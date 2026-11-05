@@ -15,10 +15,8 @@ namespace TranslocatorRelocator.src.config
         public string Normal = DefaultNormal;
         public string GoHome = DefaultGoHome;
         public string NetworkHome = DefaultHome;
-        public int EmissionIntensity = 100;
         public int ParticleFlow = 100;
 
-        public int EffectiveEmission => UseDefaults ? 100 : Math.Clamp(EmissionIntensity, 50, 100);
         public int EffectiveFlow => UseDefaults ? 100 : Math.Clamp(ParticleFlow, 60, 140);
 
         public string GetColor(int mode)
@@ -63,7 +61,6 @@ namespace TranslocatorRelocator.src.config
             Normal = ValidateHex(Normal, DefaultNormal);
             GoHome = ValidateHex(GoHome, DefaultGoHome);
             NetworkHome = ValidateHex(NetworkHome, DefaultHome);
-            EmissionIntensity = Math.Clamp(EmissionIntensity, 50, 100);
             ParticleFlow = Math.Clamp(ParticleFlow, 60, 140);
         }
 
