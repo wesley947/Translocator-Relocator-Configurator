@@ -28,7 +28,7 @@ namespace TranslocatorRelocator.src.gui
             settings = Core.ParticleVisuals ?? new ParticleVisualConfig();
             settings.Sanitize();
 
-            ElementBounds shade = ElementBounds.FixedSize(390, 427)
+            ElementBounds shade = ElementBounds.FixedSize(390, 412)
                 .WithFixedPadding(GuiStyle.ElementToDialogPadding);
             ElementBounds root = ElementStdBounds.AutosizedMainDialog
                 .WithAlignment(EnumDialogArea.RightMiddle)
@@ -38,42 +38,44 @@ namespace TranslocatorRelocator.src.gui
                 .AddShadedDialogBG(shade)
                 .AddDialogTitleBar("Translocator Particle Effects", OnTitleBarClose)
                 .BeginChildElements(shade)
-                .AddStaticText("Use default effects", CairoFont.WhiteSmallText(),
-                    ElementBounds.Fixed(0, 37, 190, 26))
-                .AddSwitch(OnDefaultsChanged,
-                    ElementBounds.Fixed(326, 30, 36, 36), "useDefaults")
-
                 .AddStaticText("Select particle type", CairoFont.WhiteSmallText(),
-                    ElementBounds.Fixed(0, 76, 195, 24))
-                .AddDynamicCustomDraw(ElementBounds.Fixed(0, 100, 366, 18),
+                    ElementBounds.Fixed(0, 37, 195, 24))
+                .AddDynamicCustomDraw(ElementBounds.Fixed(0, 61, 366, 18),
                     DrawModeBars, "modeBars")
-                .AddSmallButton("Normal", OnNormal,
-                    ElementBounds.Fixed(0, 123, 115, 28))
-                .AddSmallButton("Go Home", OnGoHome,
-                    ElementBounds.Fixed(125, 123, 115, 28))
-                .AddSmallButton("Home", OnNetworkHome,
-                    ElementBounds.Fixed(250, 123, 115, 28))
+                .AddTextToggleButtons(
+                    new[] { "Normal", "Go Home", "Home" }, CairoFont.WhiteSmallText(),
+                    OnModeSelected,
+                    new[] {
+                        ElementBounds.Fixed(0, 84, 115, 28),
+                        ElementBounds.Fixed(125, 84, 115, 28),
+                        ElementBounds.Fixed(250, 84, 115, 28)
+                    }, "particleMode")
 
                 .AddStaticText("Choose color", CairoFont.WhiteSmallText(),
-                    ElementBounds.Fixed(0, 165, 195, 24))
+                    ElementBounds.Fixed(0, 126, 195, 24))
                 .AddColorListPicker(PaletteColors, OnColorPicked,
-                    ElementBounds.Fixed(28, 189, 34, 28), 311, "colorPalette")
+                    ElementBounds.Fixed(28, 150, 34, 28), 311, "colorPalette")
                 .AddDynamicText("", CairoFont.WhiteSmallText(),
-                    ElementBounds.Fixed(0, 291, 366, 24), "currentColor")
+                    ElementBounds.Fixed(0, 252, 366, 24), "currentColor")
 
                 .AddStaticText("Particle flow", CairoFont.WhiteSmallText(),
-                    ElementBounds.Fixed(0, 325, 170, 24))
+                    ElementBounds.Fixed(0, 286, 170, 24))
                 .AddDynamicText("", CairoFont.WhiteSmallText(),
-                    ElementBounds.Fixed(312, 325, 54, 24), "flowValue")
+                    ElementBounds.Fixed(312, 286, 54, 24), "flowValue")
                 .AddSlider(OnFlowChanged,
-                    ElementBounds.Fixed(0, 352, 366, 28), "flow")
+                    ElementBounds.Fixed(0, 313, 366, 28), "flow")
+                .AddStaticText("Use default effects", CairoFont.WhiteSmallText(),
+                    ElementBounds.Fixed(0, 375, 190, 26))
+                .AddSwitch(OnDefaultsChanged,
+                    ElementBounds.Fixed(201, 366, 36, 36), "useDefaults")
                 .AddSmallButton("Done", OnDone,
-                    ElementBounds.Fixed(281, 388, 84, 28))
+                    ElementBounds.Fixed(281, 373, 84, 28))
                 .EndChildElements()
                 .Compose();
 
             SingleComposer.GetSwitch("useDefaults").SetValue(settings.UseDefaults);
             SingleComposer.GetSlider("flow").SetValues(settings.ParticleFlow, 60, 140, 5, "%");
+            SingleComposer.ToggleButtonsSetValue("particleMode", selectedMode);
             RefreshDisplay();
         }
 
@@ -124,6 +126,7 @@ namespace TranslocatorRelocator.src.gui
                 if (swatch != null) swatch.Enabled = editing;
             }
 
+            SingleComposer.ToggleButtonsSetValue("particleMode", selectedMode);
             string effectiveColor = settings.GetColor(selectedMode);
             string displayName = selectedMode == 1 ? "Go Home" : selectedMode == 2 ? "Network Home" : "Normal";
             string status = settings.UseDefaults ? "Default" : "Custom";
@@ -139,16 +142,11 @@ namespace TranslocatorRelocator.src.gui
             SingleComposer.GetCustomDraw("modeBars")?.Redraw();
         }
 
-        private bool SelectMode(int mode)
+        private void OnModeSelected(int mode)
         {
             selectedMode = mode;
             RefreshDisplay();
-            return true;
         }
-
-        private bool OnNormal() => SelectMode(0);
-        private bool OnGoHome() => SelectMode(1);
-        private bool OnNetworkHome() => SelectMode(2);
 
         private void OnColorPicked(int index)
         {
