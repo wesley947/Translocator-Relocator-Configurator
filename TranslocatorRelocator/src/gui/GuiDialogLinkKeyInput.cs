@@ -36,7 +36,7 @@ namespace TranslocatorRelocator.src.gui
             ElementBounds clipBounds1 = textInputBounds.ForkBoundingParent().WithFixedPosition(0.0, 30.0);
             ElementBounds cancelButtonBounds = ElementBounds.FixedSize(0.0, 0.0).FixedUnder(clipBounds1, 56.0).WithAlignment(EnumDialogArea.LeftFixed).WithFixedPadding(8.0, 2.0).WithFixedAlignmentOffset(-1.0, 0.0);
             ElementBounds saveButtonBounds = ElementBounds.FixedSize(0.0, 0.0).FixedUnder(clipBounds1, 56.0).WithAlignment(EnumDialogArea.RightFixed).WithFixedPadding(10.0, 2.0).WithFixedAlignmentOffset(6, 0);
-            ElementBounds shadeElementBounds = ElementBounds.FixedSize(350, 150).WithFixedPadding(GuiStyle.ElementToDialogPadding);
+            ElementBounds shadeElementBounds = ElementBounds.FixedSize(334, 150).WithFixedPadding(GuiStyle.ElementToDialogPadding);
             ElementBounds mainBounds = ElementStdBounds.AutosizedMainDialog.WithAlignment(EnumDialogArea.RightMiddle).WithFixedAlignmentOffset(0.0 - GuiStyle.DialogToScreenPadding, 0.0);
             CairoFont cairoFont = CairoFont.TextInput().WithFontSize(20).WithFont("Consolas");
             cairoFont.LineHeightMultiplier = 0.9;
