@@ -234,7 +234,7 @@ namespace TranslocatorRelocator.src.block
                 animUtil.StopAnimation("idle");
             }
 
-            // Client-only appearance preferences. With defaults enabled this is exactly v1.0.10.
+            // Client-only appearance preferences; the initial values match v1.0.10.
             int visualMode = homeDesignationVisual ? 2 : (travelHome ? 1 : 0);
             int[] customRgb = Core.ParticleVisuals?.ActiveRgb(visualMode);
             int num3 = customRgb != null ? customRgb[0] : (homeDesignationVisual ? 110 : (travelHome ? 255 : 22));
