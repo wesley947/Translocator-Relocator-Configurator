@@ -6,7 +6,7 @@
     <OutputPath>bin\$(Configuration)\Mods\mod</OutputPath>
     <!-- Release packaging. ModVersion must stay in sync with modinfo.json's "version" field. -->
     <ModId>translocatorconfigurator</ModId>
-    <ModVersion>1.0.10</ModVersion>
+    <ModVersion>1.0.11</ModVersion>
     <ReleasesDir>$(ProjectDir)Releases</ReleasesDir>
     <ReleasePath>$(ReleasesDir)\$(ModId)_$(ModVersion).zip</ReleasePath>
   </PropertyGroup>
