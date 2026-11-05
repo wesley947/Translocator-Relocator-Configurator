@@ -11,17 +11,17 @@ namespace TranslocatorRelocator.src.config
         public const string DefaultGoHome = "#FF3C24";
         public const string DefaultHome = "#6E37DC";
 
-        public bool UseDefaults = true;
+        // Legacy field retained for migrating old toggle-based settings.
+        public bool UseDefaults = false;
         public string Normal = DefaultNormal;
         public string GoHome = DefaultGoHome;
         public string NetworkHome = DefaultHome;
         public int ParticleFlow = 100;
 
-        public int EffectiveFlow => UseDefaults ? 100 : Math.Clamp(ParticleFlow, 60, 140);
+        public int EffectiveFlow => Math.Clamp(ParticleFlow, 60, 140);
 
         public string GetColor(int mode)
         {
-            if (UseDefaults) return DefaultFor(mode);
             return mode switch
             {
                 1 => ValidateHex(GoHome, DefaultGoHome),
@@ -56,8 +56,20 @@ namespace TranslocatorRelocator.src.config
             return ParseRgb(GetColor(mode));
         }
 
+        public void ResetToDefaults()
+        {
+            Normal = DefaultNormal;
+            GoHome = DefaultGoHome;
+            NetworkHome = DefaultHome;
+            ParticleFlow = 100;
+            UseDefaults = false;
+        }
+
         public void Sanitize()
         {
+            // A previous version used UseDefaults as a persistent editing lock.
+            // Convert that state to the same actual values as the new Reset button.
+            if (UseDefaults) ResetToDefaults();
             Normal = ValidateHex(Normal, DefaultNormal);
             GoHome = ValidateHex(GoHome, DefaultGoHome);
             NetworkHome = ValidateHex(NetworkHome, DefaultHome);
