@@ -244,9 +244,8 @@ namespace TranslocatorRelocator.src.block
             simpleParticleProperties.Color = (num3 << 16) | (num4 << 8) | num5 | particleAlpha;
             // Keep the falling particles self-illuminated in darkness (does not light nearby blocks).
             simpleParticleProperties.VertexFlags = 128;
-            int emission = Core.ParticleVisuals?.EffectiveEmission ?? 100;
-            simpleParticleProperties.LightEmission = ColorUtil.ColorFromRgba(
-                num3 * emission / 100, num4 * emission / 100, num5 * emission / 100, 255);
+            // Preserve the tested v1.0.10 emissive color encoding and intensity.
+            simpleParticleProperties.LightEmission = ColorUtil.ColorFromRgba(num3, num4, num5, 255);
             simpleParticleProperties.AddPos.Set(0.0, 0.0, 0.0);
             simpleParticleProperties.BlueEvolve = EvolvingNatFloat.NoValueSet;
             simpleParticleProperties.RedEvolve = EvolvingNatFloat.NoValueSet;
