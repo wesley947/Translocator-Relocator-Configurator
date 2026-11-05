@@ -28,7 +28,7 @@ namespace TranslocatorRelocator.src.gui
             settings = Core.ParticleVisuals ?? new ParticleVisualConfig();
             settings.Sanitize();
 
-            ElementBounds shade = ElementBounds.FixedSize(370, 308)
+            ElementBounds shade = ElementBounds.FixedSize(370, 372)
                 .WithFixedPadding(GuiStyle.ElementToDialogPadding);
             ElementBounds root = ElementStdBounds.AutosizedMainDialog
                 .WithAlignment(EnumDialogArea.RightMiddle)
@@ -55,19 +55,26 @@ namespace TranslocatorRelocator.src.gui
                     ElementBounds.Fixed(0, 126, 195, 24))
                 .AddColorListPicker(PaletteColors, OnColorPicked,
                     ElementBounds.Fixed(0, 150, 34, 28), 345, "colorPalette")
-                .AddStaticText("Particle flow", CairoFont.WhiteSmallText(),
+                .AddStaticText("Brightness", CairoFont.WhiteSmallText(),
                     ElementBounds.Fixed(0, 191, 170, 24))
                 .AddDynamicText("", CairoFont.WhiteSmallText(),
-                    ElementBounds.Fixed(312, 191, 54, 24), "flowValue")
+                    ElementBounds.Fixed(312, 191, 54, 24), "brightnessValue")
+                .AddSlider(OnBrightnessChanged,
+                    ElementBounds.Fixed(0, 218, 366, 28), "brightness")
+                .AddStaticText("Particle flow", CairoFont.WhiteSmallText(),
+                    ElementBounds.Fixed(0, 254, 170, 24))
+                .AddDynamicText("", CairoFont.WhiteSmallText(),
+                    ElementBounds.Fixed(312, 254, 54, 24), "flowValue")
                 .AddSlider(OnFlowChanged,
-                    ElementBounds.Fixed(0, 218, 366, 28), "flow")
+                    ElementBounds.Fixed(0, 281, 366, 28), "flow")
                 .AddSmallButton("Use Defaults", OnResetDefaults,
-                    ElementBounds.Fixed(0, 266, 145, 28))
+                    ElementBounds.Fixed(0, 330, 145, 28))
                 .AddSmallButton("Done", OnDone,
-                    ElementBounds.Fixed(281, 266, 84, 28))
+                    ElementBounds.Fixed(281, 330, 84, 28))
                 .EndChildElements()
                 .Compose();
 
+            SingleComposer.GetSlider("brightness").SetValues(settings.GetBrightness(selectedMode), 30, 100, 5, "%");
             SingleComposer.GetSlider("flow").SetValues(settings.ParticleFlow, 60, 140, 5, "%");
             SingleComposer.ToggleButtonsSetValue("particleMode", selectedMode);
             RefreshDisplay();
@@ -109,9 +116,12 @@ namespace TranslocatorRelocator.src.gui
         private void RefreshDisplay()
         {
             if (SingleComposer == null) return;
+            SingleComposer.GetSlider("brightness").SetValue(settings.GetBrightness(selectedMode));
             SingleComposer.GetSlider("flow").SetValue(settings.EffectiveFlow);
 
             SingleComposer.ToggleButtonsSetValue("particleMode", selectedMode);
+            SingleComposer.GetDynamicText("brightnessValue").SetNewText(
+                settings.GetBrightness(selectedMode) + "%", forceRedraw: true);
             SingleComposer.GetDynamicText("flowValue").SetNewText(
                 settings.EffectiveFlow + "%", forceRedraw: true);
 
@@ -125,6 +135,8 @@ namespace TranslocatorRelocator.src.gui
         private void OnModeSelected(int mode)
         {
             selectedMode = mode;
+            // SetValues also redraws the slider track/label when changing particle mode.
+            SingleComposer.GetSlider("brightness").SetValues(settings.GetBrightness(selectedMode), 30, 100, 5, "%");
             RefreshDisplay();
         }
 
@@ -140,8 +152,17 @@ namespace TranslocatorRelocator.src.gui
         {
             // An explicit reset changes stored values; controls stay editable afterward.
             settings.ResetToDefaults();
+            SingleComposer.GetSlider("brightness").SetValues(settings.GetBrightness(selectedMode), 30, 100, 5, "%");
+            SingleComposer.GetSlider("flow").SetValues(settings.ParticleFlow, 60, 140, 5, "%");
             RefreshDisplay();
             Core.SaveParticleVisuals();
+            return true;
+        }
+
+        private bool OnBrightnessChanged(int newValue)
+        {
+            settings.SetBrightness(selectedMode, newValue);
+            RefreshDisplay();
             return true;
         }
 
