@@ -61,16 +61,13 @@ namespace TranslocatorRelocator.src.gui
                     ElementBounds.Fixed(312, 191, 54, 24), "flowValue")
                 .AddSlider(OnFlowChanged,
                     ElementBounds.Fixed(0, 218, 366, 28), "flow")
-                .AddStaticText("Use Defaults", CairoFont.WhiteSmallText(),
-                    ElementBounds.Fixed(0, 268, 190, 26))
-                .AddSwitch(OnDefaultsChanged,
-                    ElementBounds.Fixed(124, 263, 36, 36), "useDefaults")
+                .AddSmallButton("Use Defaults", OnResetDefaults,
+                    ElementBounds.Fixed(0, 266, 145, 28))
                 .AddSmallButton("Done", OnDone,
                     ElementBounds.Fixed(281, 266, 84, 28))
                 .EndChildElements()
                 .Compose();
 
-            SingleComposer.GetSwitch("useDefaults").SetValue(settings.UseDefaults);
             SingleComposer.GetSlider("flow").SetValues(settings.ParticleFlow, 60, 140, 5, "%");
             SingleComposer.ToggleButtonsSetValue("particleMode", selectedMode);
             RefreshDisplay();
@@ -112,16 +109,7 @@ namespace TranslocatorRelocator.src.gui
         private void RefreshDisplay()
         {
             if (SingleComposer == null) return;
-            bool editing = !settings.UseDefaults;
-
-            var flowSlider = SingleComposer.GetSlider("flow");
-            if (flowSlider.Enabled != editing) flowSlider.Enabled = editing;
-            flowSlider.SetValue(settings.EffectiveFlow);
-            for (int i = 0; i < PaletteHex.Length; i++)
-            {
-                var swatch = SingleComposer.GetColorListPicker("colorPalette-" + i);
-                if (swatch != null) swatch.Enabled = editing;
-            }
+            SingleComposer.GetSlider("flow").SetValue(settings.EffectiveFlow);
 
             SingleComposer.ToggleButtonsSetValue("particleMode", selectedMode);
             SingleComposer.GetDynamicText("flowValue").SetNewText(
@@ -142,23 +130,23 @@ namespace TranslocatorRelocator.src.gui
 
         private void OnColorPicked(int index)
         {
-            if (settings.UseDefaults || index < 0 || index >= PaletteHex.Length) return;
+            if (index < 0 || index >= PaletteHex.Length) return;
             settings.SetCustomColor(selectedMode, PaletteHex[index]);
             RefreshDisplay();
             Core.SaveParticleVisuals();
         }
 
-        private void OnDefaultsChanged(bool enabled)
+        private bool OnResetDefaults()
         {
-            // Switching to defaults NEVER overwrites the remembered custom palette or flow.
-            settings.UseDefaults = enabled;
+            // An explicit reset changes stored values; controls stay editable afterward.
+            settings.ResetToDefaults();
             RefreshDisplay();
             Core.SaveParticleVisuals();
+            return true;
         }
 
         private bool OnFlowChanged(int newValue)
         {
-            if (settings.UseDefaults) return true;
             settings.ParticleFlow = Math.Clamp(newValue, 60, 140);
             RefreshDisplay();
             return true;
