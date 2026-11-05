@@ -15,7 +15,7 @@ Relocate repaired static translocators, connect them into named networks, and en
 - **Home Destinations:** Designate one Home translocator per network.
 - **Travel Modes:** Right-click to toggle between Random and Go Home.
 - **Visual Indicators:** Original green particles for Random, red for Go Home, and purple for designated Home.
-- **Particle Effects Editor (v1.0.11):** Customize the falling particle streams for Normal, Go Home, and Network Home independently using nine vivid color swatches. Set shared particle flow from 60% to 140%, with a one-click **Use Defaults** button to restore the original colors and 100% flow. Changes preview live and save per client.
+- **Particle Effects Editor (v1.0.11):** Choose among nine vivid swatches and adjust independent 30–100% brightness (5% steps) for Normal, Go Home, and Network Home. The original rich colors are reproduced at 60%; higher settings blend toward pastels. Set shared particle flow from 60% to 140%, or use **Use Defaults** to restore the original colors, 60% brightness for each mode, and 100% flow. Changes preview live and save per client.
 - **Network Dropdown:** Select existing networks or enter names manually.
 - **Network-Wide Renaming:** Rename an entire network, including translocators in unloaded chunks.
 - **Safety Confirmations:** Prevent accidental Home replacement and conflicting network names.
