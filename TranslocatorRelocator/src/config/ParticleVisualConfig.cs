@@ -18,6 +18,11 @@ namespace TranslocatorRelocator.src.config
         public string NetworkHome = DefaultHome;
         public int ParticleFlow = 100;
 
+        // Separate shade controls for each state; 60% reproduces the original color.
+        public int NormalBrightness = 60;
+        public int GoHomeBrightness = 60;
+        public int HomeBrightness = 60;
+
         public int EffectiveFlow => Math.Clamp(ParticleFlow, 60, 140);
 
         public string GetColor(int mode)
@@ -51,9 +56,56 @@ namespace TranslocatorRelocator.src.config
             }
         }
 
+        public int GetBrightness(int mode)
+        {
+            return mode switch
+            {
+                1 => GoHomeBrightness,
+                2 => HomeBrightness,
+                _ => NormalBrightness
+            };
+        }
+
+        public void SetBrightness(int mode, int brightness)
+        {
+            brightness = ClampBrightness(brightness);
+            switch (mode)
+            {
+                case 1: GoHomeBrightness = brightness; break;
+                case 2: HomeBrightness = brightness; break;
+                default: NormalBrightness = brightness; break;
+            }
+        }
+
+        // This transforms particle emission RGB only. The saved swatch color remains
+        // unchanged so its selection highlight always matches the base color.
         public int[] ActiveRgb(int mode)
         {
-            return ParseRgb(GetColor(mode));
+            int[] rgb = ParseRgb(GetColor(mode));
+            int brightness = ClampBrightness(GetBrightness(mode));
+            if (brightness == 60) return rgb;
+
+            if (brightness < 60)
+            {
+                // Minimum at 30% is half of the original RGB: dark, but not black.
+                double scale = 0.5 + (brightness - 30) / 60d;
+                for (int i = 0; i < 3; i++)
+                    rgb[i] = (int)Math.Round(rgb[i] * scale);
+            }
+            else
+            {
+                // At 100%, blend 58% toward white for a visible pastel shade.
+                // Values never whiten out entirely unless the base swatch is white.
+                double whiteMix = 0.58 * (brightness - 60) / 40d;
+                for (int i = 0; i < 3; i++)
+                    rgb[i] = (int)Math.Round(rgb[i] + (255 - rgb[i]) * whiteMix);
+            }
+            return rgb;
+        }
+
+        private static int ClampBrightness(int brightness)
+        {
+            return Math.Clamp(30 + (int)Math.Round((Math.Clamp(brightness, 30, 100) - 30) / 5d) * 5, 30, 100);
         }
 
         public void ResetToDefaults()
@@ -62,6 +114,9 @@ namespace TranslocatorRelocator.src.config
             GoHome = DefaultGoHome;
             NetworkHome = DefaultHome;
             ParticleFlow = 100;
+            NormalBrightness = 60;
+            GoHomeBrightness = 60;
+            HomeBrightness = 60;
             UseDefaults = false;
         }
 
@@ -74,6 +129,9 @@ namespace TranslocatorRelocator.src.config
             GoHome = ValidateHex(GoHome, DefaultGoHome);
             NetworkHome = ValidateHex(NetworkHome, DefaultHome);
             ParticleFlow = Math.Clamp(ParticleFlow, 60, 140);
+            NormalBrightness = ClampBrightness(NormalBrightness);
+            GoHomeBrightness = ClampBrightness(GoHomeBrightness);
+            HomeBrightness = ClampBrightness(HomeBrightness);
         }
 
         public static string DefaultFor(int mode)
