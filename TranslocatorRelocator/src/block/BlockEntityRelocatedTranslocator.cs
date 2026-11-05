@@ -234,16 +234,19 @@ namespace TranslocatorRelocator.src.block
                 animUtil.StopAnimation("idle");
             }
 
-            // Normal retains original green/opacity. Home and Go Home are more saturated
-            // and less translucent so that red and purple remain distinct in-game.
-            int num3 = homeDesignationVisual ? 110 : (travelHome ? 255 : 22);
-            int num4 = homeDesignationVisual ? 55 : (travelHome ? 60 : 160);
-            int num5 = homeDesignationVisual ? 220 : (travelHome ? 36 : 100);
+            // Client-only appearance preferences. With defaults enabled this is exactly v1.0.10.
+            int visualMode = homeDesignationVisual ? 2 : (travelHome ? 1 : 0);
+            int[] customRgb = Core.ParticleVisuals?.ActiveRgb(visualMode);
+            int num3 = customRgb != null ? customRgb[0] : (homeDesignationVisual ? 110 : (travelHome ? 255 : 22));
+            int num4 = customRgb != null ? customRgb[1] : (homeDesignationVisual ? 55 : (travelHome ? 60 : 160));
+            int num5 = customRgb != null ? customRgb[2] : (homeDesignationVisual ? 220 : (travelHome ? 36 : 100));
             int particleAlpha = (homeDesignationVisual || travelHome) ? unchecked((int)0xA0000000) : 0x32000000;
             simpleParticleProperties.Color = (num3 << 16) | (num4 << 8) | num5 | particleAlpha;
             // Keep the falling particles self-illuminated in darkness (does not light nearby blocks).
             simpleParticleProperties.VertexFlags = 128;
-            simpleParticleProperties.LightEmission = ColorUtil.ColorFromRgba(num3, num4, num5, 255);
+            int emission = Core.ParticleVisuals?.EffectiveEmission ?? 100;
+            simpleParticleProperties.LightEmission = ColorUtil.ColorFromRgba(
+                num3 * emission / 100, num4 * emission / 100, num5 * emission / 100, 255);
             simpleParticleProperties.AddPos.Set(0.0, 0.0, 0.0);
             simpleParticleProperties.BlueEvolve = EvolvingNatFloat.NoValueSet;
             simpleParticleProperties.RedEvolve = EvolvingNatFloat.NoValueSet;
@@ -260,9 +263,10 @@ namespace TranslocatorRelocator.src.block
             simpleParticleProperties.LifeLength = GameMath.Sqrt(num6 * num6 + num8 * num8) / 10f;
             simpleParticleProperties.MinPos.Set(posvec.X + num6, posvec.Y + num7, posvec.Z + num8);
             simpleParticleProperties.MinVelocity.Set((0f - (float)num6) / 2f, -1f - (float)Api.World.Rand.NextDouble() / 2f, (0f - (float)num8) / 2f);
-            simpleParticleProperties.MinQuantity = (flag2 ? 3f : 0.25f);
+            float flowScale = (Core.ParticleVisuals?.EffectiveFlow ?? 100) / 100f;
+            simpleParticleProperties.MinQuantity = (flag2 ? 3f : 0.25f) * flowScale;
             simpleParticleProperties.AddVelocity.Set(0f, 0f, 0f);
-            simpleParticleProperties.AddQuantity = 0.5f;
+            simpleParticleProperties.AddQuantity = 0.5f * flowScale;
             Api.World.SpawnParticles(simpleParticleProperties);
             simpleParticleProperties.MinPos.Set(posvec.X - num6, posvec.Y + num7, posvec.Z - num8);
             simpleParticleProperties.MinVelocity.Set((float)num6 / 2f, -1f - (float)Api.World.Rand.NextDouble() / 2f, (float)num8 / 2f);
