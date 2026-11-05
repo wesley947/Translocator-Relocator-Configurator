@@ -41,7 +41,7 @@ namespace TranslocatorRelocator.src.gui
                 .AddStaticText("Use default effects", CairoFont.WhiteSmallText(),
                     ElementBounds.Fixed(0, 7, 190, 26))
                 .AddSwitch(OnDefaultsChanged,
-                    ElementBounds.Fixed(201, 0, 36, 36), "useDefaults")
+                    ElementBounds.Fixed(326, 0, 36, 36), "useDefaults")
 
                 .AddStaticText("Select particle type", CairoFont.WhiteSmallText(),
                     ElementBounds.Fixed(0, 46, 195, 24))
