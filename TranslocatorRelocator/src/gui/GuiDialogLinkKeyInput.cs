@@ -14,12 +14,14 @@ namespace TranslocatorRelocator.src.gui
         const int MAX_KEY_LENGHT = 16;
         private bool makeHome;
         private readonly string originalNetwork;
+        private readonly int initialParticleMode;
 
-        public GuiDialogLinkKeyInput(string DialogTitle, BlockPos pos, string linkKey, bool isHome, string[] networkNames, ICoreClientAPI capi) : base(DialogTitle, capi)
+        public GuiDialogLinkKeyInput(string DialogTitle, BlockPos pos, string linkKey, bool isHome, string[] networkNames, int initialParticleMode, ICoreClientAPI capi) : base(DialogTitle, capi)
         {
             blockEntityPos = pos;
             makeHome = isHome;
             originalNetwork = linkKey;
+            this.initialParticleMode = Math.Clamp(initialParticleMode, 0, 2);
             // First choice is only a label. Choosing a real network copies its name
             // into the original editable field; players can still type any name.
             string[] available = (networkNames ?? Array.Empty<string>())
@@ -48,7 +50,7 @@ namespace TranslocatorRelocator.src.gui
                 .AddTextInput(textInputBounds, OnTextInputChanged, cairoFont, "linkKey")
                 .EndClip()
                 .AddDropDown(choices, displayNames, 0, OnNetworkChosen, ElementBounds.Fixed(199, 30, 128, 28), "existingNetworks")
-                .AddStaticText("Set as Home", CairoFont.WhiteSmallText(), ElementBounds.Fixed(95, 118, 128, 25))
+                .AddStaticText("Set as Base", CairoFont.WhiteSmallText(), ElementBounds.Fixed(95, 118, 128, 25))
                 .AddSwitch(value => makeHome = value, ElementBounds.Fixed(211, 112, 36, 36), "makeHome");
             if (isHome)
                 composer.AddSmallButton("Rename Network", OnRenameNetwork,
@@ -100,7 +102,7 @@ namespace TranslocatorRelocator.src.gui
         private bool OnParticleColors()
         {
             TryClose();
-            new GuiDialogParticleColors(capi).TryOpen();
+            new GuiDialogParticleColors(capi, initialParticleMode).TryOpen();
             return true;
         }
 
