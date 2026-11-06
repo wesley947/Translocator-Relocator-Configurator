@@ -23,10 +23,11 @@ namespace TranslocatorRelocator.src.gui
         private readonly ParticleVisualConfig settings;
         private int selectedMode;
 
-        public GuiDialogParticleColors(ICoreClientAPI capi) : base("Translocator Particle Effects", capi)
+        public GuiDialogParticleColors(ICoreClientAPI capi, int initialMode) : base("Translocator Particle Effects", capi)
         {
             settings = Core.ParticleVisuals ?? new ParticleVisualConfig();
             settings.Sanitize();
+            selectedMode = Math.Clamp(initialMode, 0, 2);
 
             ElementBounds shade = ElementBounds.FixedSize(370, 372)
                 .WithFixedPadding(GuiStyle.ElementToDialogPadding);
@@ -43,7 +44,7 @@ namespace TranslocatorRelocator.src.gui
                 .AddDynamicCustomDraw(ElementBounds.Fixed(0, 61, 366, 18),
                     DrawModeBars, "modeBars")
                 .AddTextToggleButtons(
-                    new[] { "Normal", "Go Home", "Home" }, CairoFont.WhiteSmallText(),
+                    new[] { "Random", "Go Home", "Home Base" }, CairoFont.WhiteSmallText(),
                     OnModeSelected,
                     new[] {
                         ElementBounds.Fixed(0, 84, 115, 28),
