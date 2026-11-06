@@ -12,14 +12,14 @@ Relocate repaired static translocators, connect them into named networks, and en
 
 **+Configurator enhancements:**
 
-- **Home Destinations:** Designate one Home translocator per network.
+- **Home Base Destinations:** Designate one Home Base translocator per network.
 - **Travel Modes:** Right-click to toggle between Random and Go Home.
-- **Visual Indicators:** Original green particles for Random, red for Go Home, and purple for designated Home.
-- **Particle Effects Editor (v1.0.11):** Choose among nine vivid swatches and adjust independent 30–100% brightness (5% steps) for Normal, Go Home, and Network Home. The original rich colors are reproduced at 60%; higher settings blend toward pastels. Set shared particle flow from 60% to 140%, or use **Use Defaults** to restore the original colors, 60% brightness for each mode, and 100% flow. Changes preview live and save per client.
+- **Visual Indicators:** Original green particles for Random, red for Go Home, and purple for the designated Home Base.
+- **Particle Effects Editor (v1.0.11):** Choose among nine vivid swatches and adjust independent 30–100% brightness (5% steps) for Random, Go Home, and Home Base. The original rich colors are reproduced at 60%; higher settings blend toward pastels. Set shared particle flow from 60% to 140%, or use **Use Defaults** to restore the original colors, 60% brightness for each mode, and 100% flow. Changes preview live and save per client.
 - **Network Dropdown:** Select existing networks or enter names manually.
 - **Network-Wide Renaming:** Rename an entire network, including translocators in unloaded chunks.
-- **Safety Confirmations:** Prevent accidental Home replacement and conflicting network names.
-- **Persistent Settings:** Home designations and travel modes survive saving and reloading.
+- **Safety Confirmations:** Prevent accidental Home Base replacement and conflicting network names.
+- **Persistent Settings:** Home Base designations and travel modes survive saving and reloading.
 
 ## Controls
 
@@ -27,10 +27,10 @@ Relocate repaired static translocators, connect them into named networks, and en
 |---|---|
 | Toggle Random / Go Home | Right-click |
 | Open Translocator Configurator | Shift + Right-click |
-| Rename entire network | Shift + Right-click the designated Home translocator |
+| Rename entire network | Shift + Right-click the designated Home Base translocator |
 | Open Particle Effects | Shift + Right-click, then **Particle Colors...** |
 
-**Important:** Network-wide renaming is available only from the designated Home translocator.
+**Important:** Network-wide renaming is available only from the designated Home Base translocator.
 
 Particle Effects preferences are client-side, stored in `ModConfig/translocatorconfigurator-particles.json`. Teleportation burst particles are unchanged in v1.0.11; the customizable colors and flow apply to falling particle streams.
 
