@@ -390,8 +390,8 @@ namespace TranslocatorRelocator.src.block
                     dsc.AppendLine(Lang.Get("translocatorrelocatorfork:block-info-linked-status"));
                 }
             }
-            dsc.AppendLine("Travel mode: " + (travelHome ? "HOME" : "RANDOM"));
-            if (homeDesignationVisual) dsc.AppendLine("Network Home");
+            dsc.AppendLine("Travel mode: " + (travelHome ? "Go Home" : "Random"));
+            if (homeDesignationVisual) dsc.AppendLine("Home Base");
         }
 
         public override void OnBlockPlaced(ItemStack byItemStack = null)
@@ -554,7 +554,8 @@ namespace TranslocatorRelocator.src.block
                 EditLinkKeyPacket current = SerializerUtil.Deserialize<EditLinkKeyPacket>(data);
                 guiDialogLinkKeyInput = new GuiDialogLinkKeyInput(
                     Lang.Get("translocatorrelocatorfork:dialog-title-configurator"),
-                    Pos, current.LinkKey ?? "", current.IsHome, current.NetworkNames, Api as ICoreClientAPI);
+                    Pos, current.LinkKey ?? "", current.IsHome, current.NetworkNames,
+                    current.IsHome ? 2 : (travelHome ? 1 : 0), Api as ICoreClientAPI);
                 guiDialogLinkKeyInput.TryOpen();
             }
             else if (packetid == 1003)
